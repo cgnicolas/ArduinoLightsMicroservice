@@ -2,15 +2,14 @@ const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const serviceDetails = require('./config/serviceDetails');
+const Arduino = require('./utils/Arduino');
 require('dotenv').config();
 
 const app = express();
-const port = serviceDetails.port;
+const port = serviceDetails.service.port;
 app.use(morgan('tiny'));
 app.use(bodyParser.json());
 const axios = require('axios');
-
-let currentColors = {};
 
 
 const registrationOptions = {
@@ -25,23 +24,18 @@ const checkArduino = {
     json: true
 }
 
-axios.request(checkArduino)
-.then((result) => {
-    currentColors = result.data;
-})
-.then(() => {
-    return axios.request(registrationOptions);
-})
-.then(() => {
-    app.listen(port, () => {
-        console.log("Listening on port: ", port);
-        app.use('/', require('.routes/root'));
+const client = new Arduino(process.env.ARDUINO_URL);
+client.emitter.on('ready', () => {
+    axios.request(registrationOptions)
+    .then(() => {
+        app.listen(port, () => {
+            console.log("Listening on port ", port);
+            app.use('/', require('./routes/root'));
+        })
     })
-})
-.catch((err) => {
-    console.log(err.stack);
 })
 
 module.exports = {
-    currentColors
-}
+    client,
+    ARDUINO_URL: process.env.ARDUINO_URL
+};
