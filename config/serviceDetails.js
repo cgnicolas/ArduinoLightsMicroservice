@@ -2,7 +2,7 @@ const ip = require('ip');
 module.exports = {
     service : {
         name: "Arduino",
-        description: "Used to view the status and control Arduinos",
+        description: "A Registry and Controller for Wifi enabled Arduinos",
         port: 4003,
         ip: ip.address(),
         procedures: [
