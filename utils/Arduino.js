@@ -6,7 +6,8 @@ class Arduino {
         this.url = arduinoURL;
         this.type = type;
         this.name = name;
-        this.options = options
+        this.options = options;
+        this.state = {};
         this.emitter = new EventEmitter();
         this.bindFunctions = this.bindFunctions.bind(this);
         this.bindFunctions();
@@ -58,7 +59,10 @@ class Arduino {
             console.log(url);
             axios.get(url)
             .then((result) => {
-                resolve(result.data);
+                //Set new Arduino State
+                //Resolve with no args because all ards will be sent to dash
+                this.state = result.data;
+                resolve(null);
             })
             .catch((err) => {
                 reject(err);

@@ -4,6 +4,7 @@ class Registry {
         this.findArduino = this.findArduino.bind(this);
         this.register = this.register.bind(this);
         this.getArduinos = this.getArduinos.bind(this);
+        this.getArduinoStates = this.getArduinoStates.bind(this);
     }
 
     findArduino(name){
@@ -15,13 +16,20 @@ class Registry {
     getArduinos(){
         return this.arduinos;
     }
+    getArduinoStates(){
+        const states = [];
+        this.arduinos.map((el) => {
+            states.push(el.state);
+        })
+        return states;
+    }
     executeInstruction(name, instruction, payload){
         return new Promise((resolve, reject) => {
             const ard = this.findArduino(name)[0];
             if(ard){
                 ard.executeInstruction(instruction, payload)
                 .then((result) => {
-                    resolve(result);
+                    resolve(this.getArduinoStates());
                 })
                 .catch((err) => {
                     reject(err);
