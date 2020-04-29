@@ -12,6 +12,20 @@ module.exports = {
                     method: 'POST',
                     path: '/process/set/color'
                 }
+            },
+            {
+                name: 'getarduinos',
+                options: {
+                    method: 'GET' ,
+                    path: '/process/get/arduinos'
+                }
+            },
+            {
+                name: 'invoke',
+                options: {
+                    method: 'POST',
+                    path: '/process/invoke/uniqueFunction'
+                }
             }
         ]
     }

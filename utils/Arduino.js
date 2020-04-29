@@ -2,12 +2,13 @@ const axios = require('axios');
 const API = require('./API');
 const EventEmitter = require('events');
 class Arduino {
-    constructor(type, name, arduinoURL, options){
+    constructor(type, name, arduinoURL, options, uniqueFunctions, state){
         this.url = arduinoURL;
         this.type = type;
         this.name = name;
         this.options = options;
-        this.state = {};
+        this.state = state;
+        this.uniqueFunctions = uniqueFunctions;
         this.emitter = new EventEmitter();
         this.bindFunctions = this.bindFunctions.bind(this);
         this.bindFunctions();
@@ -17,6 +18,9 @@ class Arduino {
         this.executeInstruction = this.executeInstruction.bind(this);
         this._invokeInstruction = this._invokeInstruction.bind(this);
         this._setColor = this._setColor.bind(this);
+        this._setBrightness = this._setBrightness.bind(this);
+        this._findUniqueFunction = this._findUniqueFunction.bind(this);
+        this._invokeUniqueFunction = this._invokeUniqueFunction.bind(this);
     }
 
     executeInstruction(instruction, payload){
@@ -45,9 +49,41 @@ class Arduino {
                         reject(err);
                     })
                 })
+            case 'uniqueFunction':
+                return new Promise((resolve, reject) => {
+                    const { name } = payload;
+                    this._invokeUniqueFunction(name)
+                    .then((result) => {
+                        resolve(result);
+                    })
+                    .catch((err) => {
+                        reject(err);
+                    })
+                })
             default:
                 return;
         }
+    }
+
+    _findUniqueFunction(name){
+        return this.uniqueFunctions.find((el) => el.name === name);
+    }
+
+    _invokeUniqueFunction(name){
+        return new Promise((resolve, reject) => {
+            //Search for unique
+            const uniqueFunction = this._findUniqueFunction(name);
+            const url = this.url + uniqueFunction.path;
+            axios.get(url)
+            .then((result) => {
+                console.log(result.data);
+                this.state = result.data.state;
+                resolve(null);
+            })
+            .catch((err) => {
+                reject(err);
+            })
+        })
     }
 
     _setColor(rgb){
@@ -61,6 +97,20 @@ class Arduino {
             .then((result) => {
                 //Set new Arduino State
                 //Resolve with no args because all ards will be sent to dash
+                this.state = result.data.state;
+                resolve(null);
+            })
+            .catch((err) => {
+                reject(err);
+            })
+        })
+    }
+
+    _setBrightness(brightness){
+        return new Promise((resolve, reject) => {
+            const url = this.url + '/setbrightness/' + `${brightness}/`
+            axios.get(url)
+            .then((result) => {
                 this.state = result.data;
                 resolve(null);
             })

@@ -1,17 +1,24 @@
 class Registry {
     constructor(){
         this.arduinos = [];
-        this.findArduino = this.findArduino.bind(this);
+        this.getArduino = this.getArduino.bind(this);
         this.register = this.register.bind(this);
         this.getArduinos = this.getArduinos.bind(this);
         this.getArduinoStates = this.getArduinoStates.bind(this);
     }
 
-    findArduino(name){
+    getArduino(name){
         return this.arduinos.filter((el) => el.name === name);
     }
     register(arduino){
-        this.arduinos.push(arduino);
+        if(this.getArduino(arduino.name)[0]){
+            console.log("Duplicate Found. Re-registering: ", arduino.name)
+            const foundIndex = this.arduinos.findIndex(el => el.name === arduino.name);
+            this.arduinos[foundIndex] = arduino;
+        } else {
+            console.log("No Duplicate found. Registering: ", arduino.name)
+            this.arduinos.push(arduino);
+        }
     }
     getArduinos(){
         return this.arduinos;
@@ -25,7 +32,7 @@ class Registry {
     }
     executeInstruction(name, instruction, payload){
         return new Promise((resolve, reject) => {
-            const ard = this.findArduino(name)[0];
+            const ard = this.getArduino(name)[0];
             if(ard){
                 ard.executeInstruction(instruction, payload)
                 .then((result) => {
