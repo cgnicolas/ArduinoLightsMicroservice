@@ -18,9 +18,9 @@ class Arduino {
         this.executeInstruction = this.executeInstruction.bind(this);
         this._invokeInstruction = this._invokeInstruction.bind(this);
         this._setColor = this._setColor.bind(this);
-        this._setBrightness = this._setBrightness.bind(this);
         this._findUniqueFunction = this._findUniqueFunction.bind(this);
         this._invokeUniqueFunction = this._invokeUniqueFunction.bind(this);
+        this._power = this._power.bind(this);
     }
 
     executeInstruction(instruction, payload){
@@ -42,6 +42,16 @@ class Arduino {
                 return new Promise((resolve, reject) => {
                     const {rgb} = payload;
                     this._setColor(rgb)
+                    .then((result) => {
+                        resolve(result);
+                    })
+                    .catch((err) => {
+                        reject(err);
+                    })
+                })
+            case 'power':
+                return new Promise((resolve, reject) => {
+                    this._power()
                     .then((result) => {
                         resolve(result);
                     })
@@ -106,12 +116,12 @@ class Arduino {
         })
     }
 
-    _setBrightness(brightness){
+    _power(){
         return new Promise((resolve, reject) => {
-            const url = this.url + '/setbrightness/' + `${brightness}/`
+            const url = this.url + '/power';
             axios.get(url)
             .then((result) => {
-                this.state = result.data;
+                this.state = result.data.state;
                 resolve(null);
             })
             .catch((err) => {

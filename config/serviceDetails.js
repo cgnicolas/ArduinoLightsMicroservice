@@ -26,6 +26,13 @@ module.exports = {
                     method: 'POST',
                     path: '/process/invoke/uniqueFunction'
                 }
+            },
+            {
+                name: 'power',
+                options: {
+                    method: 'POST',
+                    path: '/process/set/power'
+                }
             }
         ]
     }
