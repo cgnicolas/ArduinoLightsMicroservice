@@ -88,6 +88,7 @@ class Arduino {
             .then((result) => {
                 console.log(result.data);
                 this.state = result.data.state;
+                this.uniqueFunctions = result.data.uniqueFunctions;
                 resolve(null);
             })
             .catch((err) => {
@@ -98,9 +99,7 @@ class Arduino {
 
     _setColor(rgb){
         return new Promise((resolve, reject) => {
-            const r = rgb[0];
-            const g = rgb[1];
-            const b = rgb[2];
+            const {r, g, b} = rgb;
             const url = this.url +'/setcolor/' + `${r}/${g}/${b}`;
             console.log(url);
             axios.get(url)
@@ -108,6 +107,7 @@ class Arduino {
                 //Set new Arduino State
                 //Resolve with no args because all ards will be sent to dash
                 this.state = result.data.state;
+                this.uniqueFunctions = result.data.uniqueFunctions;
                 resolve(null);
             })
             .catch((err) => {

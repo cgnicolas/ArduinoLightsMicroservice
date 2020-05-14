@@ -26,7 +26,19 @@ class Registry {
     getArduinoStates(){
         const states = [];
         this.arduinos.map((el) => {
-            states.push(el.state);
+            const uniques = [];
+            //Only Send the name of unique functions
+            el.uniqueFunctions.map((func) => {
+                uniques.push({
+                    name: func.name,
+                    type: func.type,
+                    state: func.state,
+                });
+            })
+            states.push({
+                ...el.state,
+                uniqueFunctions: uniques
+            });
         })
         return states;
     }
